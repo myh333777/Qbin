@@ -38,6 +38,17 @@ export async function getRaw(ctx: Context<AppState>) {
     throw new Response(ctx, 403, ResponseMessages.PASSWORD_INCORRECT);
   }
 
+  if (ctx.request.url.searchParams.get("meta") === "1") {
+    ctx.response.status = 200;
+    ctx.response.headers.set("Content-Type", "application/json");
+    ctx.response.body = {
+      contentType: meta.mime,
+      contentLength: meta.len,
+      title: meta.title ?? "",
+    };
+    return;
+  }
+
   const full = await getCachedContent(key, pwd, repo);
   if (!(full && "content" in full)) {
     throw new Response(ctx, 404, ResponseMessages.CONTENT_NOT_FOUND);
